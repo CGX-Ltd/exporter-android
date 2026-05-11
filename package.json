@@ -1,0 +1,23 @@
+{
+  "name": "@supernovaio/exporter-android",
+  "version": "1.6.0",
+  "description": "Export design tokens for Android",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx webpack --mode=development --watch",
+    "build": "npx webpack --mode=production"
+  },
+  "author": "Supernova.io",
+  "license": "MIT",
+  "peerDependencies": {
+    "@supernovaio/sdk-exporters": "2.3.3"
+  },
+  "devDependencies": {
+    "@supernovaio/sdk-exporters": "2.3.3",
+    "terser-webpack-plugin": "5.4.0",
+    "ts-loader": "^7.0.5",
+    "typescript": "^5.2.2",
+    "webpack": "5.105.4",
+    "webpack-cli": "6.0.1"
+  }
+}

@@ -1,0 +1,45 @@
+[
+  {
+    "key": "showDescriptions",
+    "type": "boolean",
+    "default": true,
+    "title": "Show token descriptions",
+    "description": "Show the token description as an XML comment for every exported token.",
+    "category": "Output"
+  },
+  {
+    "key": "showGeneratedFileDisclaimer",
+    "type": "boolean",
+    "default": true,
+    "title": "Show file disclaimer",
+    "description": "Add a message at the top of each file explaining it was automatically generated.",
+    "category": "Output"
+  },
+  {
+    "key": "disclaimer",
+    "type": "string",
+    "default": "This file was generated automatically by Supernova.io and should not be changed manually.\nTo modify the format or content of this file, please contact your design system team.",
+    "title": "Disclaimer message",
+    "description": "Text shown at the top of each generated file.",
+    "category": "Output",
+    "dependsOn": {
+      "showGeneratedFileDisclaimer": true
+    }
+  },
+  {
+    "key": "exportOnlyThemedTokens",
+    "type": "boolean",
+    "default": false,
+    "title": "Export only themed tokens",
+    "description": "The dark theme file will only include tokens with values different from the base.",
+    "category": "Themes"
+  },
+  {
+    "key": "exportBaseValues",
+    "type": "boolean",
+    "default": true,
+    "title": "Export base values",
+    "description": "Generate the base (light) colour file at res/values/.",
+    "category": "Themes"
+  }
+]

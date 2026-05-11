@@ -132,3 +132,51 @@ Additionally, you can also use asset exporters for all major targets, enjoy!:
 - [Flutter SVG Asset Exporter](https://github.com/Supernova-Studio/exporter-flutter-svg-assets)
 
 To browse all exporters created by our amazing community, please visit the [Supernova](https://supernova.io) Exporter Store. 
+
+---
+
+## How This Exporter Works
+
+This exporter has been migrated from the legacy Pulsar template engine to the modern **TypeScript SDK** approach used by Supernova's current exporters (such as the Jetpack Compose exporter). It compiles to a single webpack bundle at `dist/build.js`, which the Supernova runtime executes directly.
+
+### Light and Dark Mode Colours
+
+The primary motivation for the migration was dark mode support. The exporter now generates **two separate colour files**:
+
+| File | Purpose |
+|---|---|
+| `res/values/exported_colors.xml` | Base (light) colours, used by default |
+| `res/values-night/exported_colors.xml` | Dark mode colours, applied automatically by Android when the device is in dark mode |
+
+Android selects the `values-night/` resource folder automatically — no code changes are needed in the app. The dark colours are sourced from the Supernova theme named **"Dark theme"**.
+
+By default both files contain all colour tokens. If you only want the dark file to include tokens whose value actually differs from the base, enable the **Export only themed tokens** option in the exporter configuration.
+
+### Output Files
+
+| File | Token types |
+|---|---|
+| `res/values/exported_colors.xml` | Color |
+| `res/values-night/exported_colors.xml` | Color (dark theme applied) |
+| `res/values/exported_dimens.xml` | Dimension, Size, Space, Opacity, FontSize, LineHeight, LetterSpacing, ParagraphSpacing, BorderWidth |
+| `res/values/exported_radii.xml` | BorderRadius |
+| `res/values/exported_text_styles.xml` | Typography |
+| `res/font/{family}.xml` | One file per font family referenced by typography tokens |
+
+### Building
+
+```bash
+npm install
+npm run build   # production bundle → dist/build.js
+npm run dev     # development build with source maps (watch mode)
+```
+
+### Configuration
+
+| Option | Default | Description |
+|---|---|---|
+| Show token descriptions | `true` | Adds the token description as an XML comment above each entry |
+| Show file disclaimer | `true` | Adds an auto-generated notice at the top of each file |
+| Disclaimer message | — | The text used for the disclaimer |
+| Export only themed tokens | `false` | Dark theme file includes only tokens with values different from the base |
+| Export base values | `true` | Generate the light colour file at `res/values/` |

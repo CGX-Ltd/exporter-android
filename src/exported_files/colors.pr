@@ -10,8 +10,8 @@
     {[ const fullTokenPath = arrayConcat(fullTokenGroupPath, colorToken.name) /]}
     {[ const fullTokenName = arrayJoin(fullTokenPath, " ") /]}
     {[ if (colorToken.description && colorToken.description !== "") ]}
-    <!-- 
-        {{ indentMultilineText(colorToken.description, "        ") }} 
+    <!--
+        {{ indentMultilineText(colorToken.description, "        ") }}
     -->
     {[/]}
     <color name="{[ inject "export_snakecased_token_name" context fullTokenName /]}">{[ inject "export_color_value" context colorToken.value /]}</color>
