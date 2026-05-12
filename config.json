@@ -29,7 +29,7 @@
   {
     "key": "exportOnlyThemedTokens",
     "type": "boolean",
-    "default": false,
+    "default": true,
     "title": "Export only themed tokens",
     "description": "The dark theme file will only include tokens with values different from the base.",
     "category": "Themes"
