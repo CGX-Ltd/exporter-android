@@ -1,6 +1,6 @@
 {
   "name": "@cgx-ltd/exporter-android",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Export design tokens for Android",
   "main": "index.js",
   "scripts": {
