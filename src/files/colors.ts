@@ -55,7 +55,9 @@ export function generateColorFiles(
     let darkColorTokens = darkTokens.filter((t) => t.tokenType === TokenType.color)
 
     if (exportConfiguration.exportOnlyThemedTokens) {
-      const overriddenIds = new Set<string>(darkTheme.overriddenTokens.map((t) => t.id))
+      const overriddenIds = new Set<string>(
+        ((darkTheme as any).overrides ?? []).map((o: any) => o.tokenId as string)
+      )
       darkColorTokens = darkColorTokens.filter((t) => overriddenIds.has(t.id))
     }
 
