@@ -1,6 +1,6 @@
 {
   "name": "@cgx-ltd/exporter-android",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Export design tokens for Android",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "@supernovaio/sdk-exporters": "2.3.3"
   },
   "devDependencies": {
-    "@supernovaio/sdk-exporters": "2.3.3",
+    "@supernovaio/sdk-exporters": "^2.3.3",
     "prettier": "3.0.3",
     "terser-webpack-plugin": "5.4.0",
     "ts-loader": "^7.0.5",
