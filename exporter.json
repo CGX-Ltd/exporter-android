@@ -3,7 +3,7 @@
   "name": "Android",
   "description": "Export design tokens for Android",
   "source_dir": "src",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "usesBrands": true,
   "usesThemes": true,
   "usesLocale": false,
