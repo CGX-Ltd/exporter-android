@@ -30,7 +30,7 @@ Pulsar.export(async (sdk: Supernova, context: PulsarContext): Promise<Array<AnyO
 
   // Resolve the dark theme by name so we can generate res/values-night/
   const themes = await sdk.tokens.getTokenThemes(remoteVersionIdentifier)
-  const darkTheme = themes.find((t) => t.name === "Dark")
+  const darkTheme = themes.find((t) => t.name === "Dark theme")
   const darkTokens = darkTheme
     ? sdk.tokens.computeTokensByApplyingThemes(tokens, tokens, [darkTheme])
     : undefined
