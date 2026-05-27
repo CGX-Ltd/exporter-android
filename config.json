@@ -41,13 +41,5 @@
     "title": "Export base values",
     "description": "Generate the base (light) colour file at res/values/.",
     "category": "Themes"
-  },
-  {
-    "key": "stripGroupPrefix",
-    "type": "boolean",
-    "default": true,
-    "title": "Strip group prefix from names",
-    "description": "When enabled, removes the parent-group path from the start of every exported token name, using only the token's own name.",
-    "category": "Naming"
   }
 ]
