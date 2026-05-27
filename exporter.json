@@ -2,24 +2,17 @@
   "id": "cgx.exporter-android",
   "name": "Android",
   "description": "Export design tokens for Android",
-  "source_dir": "src",
-  "version": "0.0.8",
-  "usesBrands": true,
-  "usesThemes": true,
-  "usesLocale": false,
-  "executable": "/dist/build.js",
-  "engine": "latest",
-  "tags": ["Android", "Tokens", "Styles", "Colors"],
   "author": "CGX",
   "organization": "CGX",
   "homepage": "https://supernova.io",
-  "config": {
-    "output": "output.json",
-    "sources": "sources.json",
-    "js": "src/functions.js"
-  },
-  "engines": {
-    "pulsar": "1.0.0",
-    "supernova": "1.0.0"
-  }
+  "version": "0.0.9",
+  "usesBrands": true,
+  "usesThemes": true,
+  "executable": "/dist/build.js",
+  "engine": "latest",
+  "tags": [
+    "XML",
+    "Android",
+    "Tokens"
+  ]
 }

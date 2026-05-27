@@ -8,7 +8,15 @@ function fontStyle(subfamily: string): "normal" | "italic" {
 }
 
 function fontWeight(subfamily: string): number {
-  const s = subfamily.toLowerCase()
+  const s = subfamily.toLowerCase().trim()
+
+  // Supernova sometimes stores the subfamily as a raw numeric weight ("400", "700", "900").
+  // Parse those directly before trying keyword matching.
+  const numeric = parseInt(s, 10)
+  if (!isNaN(numeric) && s === String(numeric) && numeric >= 100 && numeric <= 900) {
+    return numeric
+  }
+
   if (s.includes("extralight") || s.includes("ultralight")) return 200
   if (s.includes("extrabold") || s.includes("ultrabold")) return 800
   if (s.includes("semibold") || s.includes("demibold")) return 600

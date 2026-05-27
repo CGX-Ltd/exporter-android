@@ -1,7 +1,8 @@
 import { AnyOutputFile, PulsarContext, RemoteVersionIdentifier, Supernova } from "@supernovaio/sdk-exporters"
 import { ExporterConfiguration } from "../config"
+import { ThemeTokenSet } from "./types"
 import { generateColorFiles } from "./files/colors"
-import { generateDimenFile } from "./files/dimens"
+import { generateDimenFiles } from "./files/dimens"
 import { generateRadiiFile } from "./files/radii"
 import { collectFonts, generateTextStylesFile } from "./files/text-styles"
 import { generateFontFiles } from "./files/fonts"
@@ -28,19 +29,21 @@ Pulsar.export(async (sdk: Supernova, context: PulsarContext): Promise<Array<AnyO
     tokenGroups = tokenGroups.filter((g) => g.brandId === brand.id)
   }
 
-  // Resolve the dark theme by name so we can generate res/values-night/
+  // Fetch all themes and pre-compute each theme's full token set once.
+  // Generators inspect `theme.overriddenTokens` to decide whether a theme is
+  // relevant to them (e.g. color themes vs. size themes).
   const themes = await sdk.tokens.getTokenThemes(remoteVersionIdentifier)
-  const darkTheme = themes.find((t) => t.name === "Dark")
-  const darkTokens = darkTheme
-    ? sdk.tokens.computeTokensByApplyingThemes(tokens, tokens, [darkTheme])
-    : undefined
+  const themedTokenSets: ThemeTokenSet[] = themes.map((theme) => ({
+    theme,
+    tokens: sdk.tokens.computeTokensByApplyingThemes(tokens, tokens, [theme]),
+  }))
 
   // Collect fonts referenced by typography tokens (needed for font XML files)
   const fontsMap = collectFonts(tokens)
 
   const outputFiles: AnyOutputFile[] = [
-    ...generateColorFiles(tokens, tokenGroups, darkTheme, darkTokens),
-    generateDimenFile(tokens, tokenGroups),
+    ...generateColorFiles(tokens, tokenGroups, themedTokenSets),
+    ...generateDimenFiles(tokens, tokenGroups, themedTokenSets),
     generateRadiiFile(tokens, tokenGroups),
     generateTextStylesFile(tokens, tokenGroups),
     ...generateFontFiles(fontsMap),

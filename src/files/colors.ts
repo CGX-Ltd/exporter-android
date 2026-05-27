@@ -1,9 +1,15 @@
-import { AnyOutputFile, Token, TokenGroup, TokenTheme, TokenType } from "@supernovaio/sdk-exporters"
+import { AnyOutputFile, Token, TokenGroup, TokenType } from "@supernovaio/sdk-exporters"
 import type { ColorTokenValue } from "@supernovaio/sdk-exporters"
 import { exportConfiguration } from "../index"
+import type { ThemeTokenSet } from "../types"
 import { createTextFile } from "../utils/file-helper"
 import { tokenSnakeName } from "../utils/naming"
 import { toAndroidColor } from "../utils/color"
+
+// Android resource qualifier for the dark/night colour theme.
+// Color themes (i.e. themes that override colour tokens) always write here;
+// Android picks this directory automatically when the device is in dark mode.
+const DARK_THEME_DIR = "res/values-night/"
 
 function disclaimer(): string {
   if (!exportConfiguration.showGeneratedFileDisclaimer) return ""
@@ -40,8 +46,7 @@ function colorsXml(colorTokens: Token[], tokenGroups: TokenGroup[]): string {
 export function generateColorFiles(
   baseTokens: Token[],
   tokenGroups: TokenGroup[],
-  darkTheme: TokenTheme | undefined,
-  darkTokens: Token[] | undefined
+  themedTokenSets: ThemeTokenSet[]
 ): AnyOutputFile[] {
   const files: AnyOutputFile[] = []
 
@@ -51,16 +56,25 @@ export function generateColorFiles(
     files.push(createTextFile("res/values/", "exported_colors.xml", colorsXml(baseColorTokens, tokenGroups)))
   }
 
-  if (darkTheme && darkTokens) {
-    let darkColorTokens = darkTokens.filter((t) => t.tokenType === TokenType.color)
+  // Iterate every theme and generate a night-mode colour file only for themes
+  // whose overrides are exclusively colour tokens (i.e. the "Dark" theme).
+  // Size themes that happen to also override a colour token are intentionally
+  // excluded: they match `some` but not `every`, so they never write here.
+  for (const { theme, tokens: themedTokens } of themedTokenSets) {
+    const isColorTheme =
+      theme.overriddenTokens.length > 0 &&
+      theme.overriddenTokens.every((t) => t.tokenType === TokenType.color)
+    if (!isColorTheme) continue
+
+    let themedColorTokens = themedTokens.filter((t) => t.tokenType === TokenType.color)
 
     if (exportConfiguration.exportOnlyThemedTokens) {
-      const overriddenIds = new Set<string>(darkTheme.overriddenTokens.map((t) => t.id))
-      darkColorTokens = darkColorTokens.filter((t) => overriddenIds.has(t.id))
+      const overriddenIds = new Set<string>(theme.overriddenTokens.map((t) => t.id))
+      themedColorTokens = themedColorTokens.filter((t) => overriddenIds.has(t.id))
     }
 
-    if (darkColorTokens.length > 0) {
-      files.push(createTextFile("res/values-night/", "exported_colors.xml", colorsXml(darkColorTokens, tokenGroups)))
+    if (themedColorTokens.length > 0) {
+      files.push(createTextFile(DARK_THEME_DIR, "exported_colors.xml", colorsXml(themedColorTokens, tokenGroups)))
     }
   }
 
