@@ -1,4 +1,4 @@
-import { AnyOutputFile, Token, TokenGroup, TokenTheme, TokenType } from "@supernovaio/sdk-exporters"
+import { AnyOutputFile, Token, TokenGroup, TokenType } from "@supernovaio/sdk-exporters"
 import { exportConfiguration } from "../index"
 import type { ThemeTokenSet } from "../types"
 import { createTextFile } from "../utils/file-helper"
@@ -43,11 +43,15 @@ function dimenXml(tokens: Token[], tokenGroups: TokenGroup[]): string {
 }
 
 /**
- * Maps a size-theme to an Android resource-qualifier directory.
- * e.g. theme "Small" → "res/values-small/", "Large" → "res/values-large/"
+ * Maps a known size-theme name (case-insensitive) to its Android
+ * width-qualified resource directory.  Themes not present in this map
+ * are intentionally omitted from the export.
  */
-function sizeThemeDir(theme: TokenTheme): string {
-  return `res/values-${theme.name.toLowerCase()}/`
+const SIZE_THEME_DIR: Readonly<Record<string, string>> = {
+  xsmall: "res/values-w480dp/",
+  small:  "res/values-w768dp/",
+  medium: "res/values-w992dp/",
+  large:  "res/values-w1400dp/",
 }
 
 export function generateDimenFiles(
@@ -60,11 +64,12 @@ export function generateDimenFiles(
   // Base dimensions always go into the default values/ directory.
   files.push(createTextFile("res/values/", "exported_dimens.xml", dimenXml(baseTokens, tokenGroups)))
 
-  // Generate a themed dimen file for each theme that overrides dimension tokens.
-  // Colour-only themes (e.g. "Dark") are skipped automatically.
+  // Generate a themed dimen file only for known size themes.
+  // Colour-only themes (e.g. "Dark") are skipped because they have no
+  // dimension overrides. Unrecognised size names are omitted entirely.
   for (const { theme, tokens: themedTokens } of themedTokenSets) {
-    const isSizeTheme = theme.overriddenTokens.some((t) => MEASURE_TYPES.has(t.tokenType))
-    if (!isSizeTheme) continue
+    const dir = SIZE_THEME_DIR[theme.name.toLowerCase()]
+    if (!dir) continue
 
     // Only include tokens whose values actually differ in this theme.
     const overriddenIds = new Set<string>(theme.overriddenTokens.map((t) => t.id))
@@ -73,7 +78,7 @@ export function generateDimenFiles(
     )
 
     if (themedDimenTokens.length > 0) {
-      files.push(createTextFile(sizeThemeDir(theme), "exported_dimens.xml", dimenXml(themedDimenTokens, tokenGroups)))
+      files.push(createTextFile(dir, "exported_dimens.xml", dimenXml(themedDimenTokens, tokenGroups)))
     }
   }
 
