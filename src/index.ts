@@ -4,8 +4,7 @@ import { ThemeTokenSet } from "./types"
 import { generateColorFiles } from "./files/colors"
 import { generateDimenFiles } from "./files/dimens"
 import { generateRadiiFile } from "./files/radii"
-import { collectFonts, generateTextStylesFile } from "./files/text-styles"
-import { generateFontFiles } from "./files/fonts"
+import { generateTextStylesFile } from "./files/text-styles"
 
 export const exportConfiguration = Pulsar.exportConfig<ExporterConfiguration>()
 
@@ -38,15 +37,11 @@ Pulsar.export(async (sdk: Supernova, context: PulsarContext): Promise<Array<AnyO
     tokens: sdk.tokens.computeTokensByApplyingThemes(tokens, tokens, [theme]),
   }))
 
-  // Collect fonts referenced by typography tokens (needed for font XML files)
-  const fontsMap = collectFonts(tokens)
-
   const outputFiles: AnyOutputFile[] = [
     ...generateColorFiles(tokens, tokenGroups, themedTokenSets),
     ...generateDimenFiles(tokens, tokenGroups, themedTokenSets),
     generateRadiiFile(tokens, tokenGroups),
     generateTextStylesFile(tokens, tokenGroups),
-    ...generateFontFiles(fontsMap),
   ]
 
   return outputFiles

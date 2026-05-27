@@ -63,7 +63,9 @@ function renderTextStyles(tokens: Token[], tokenGroups: TokenGroup[]): string {
       lines.push(`        <item name="android:textSize">${fontSize}sp</item>`)
     }
     if (letterSpacing !== undefined) {
-      lines.push(`        <item name="android:letterSpacing">${letterSpacing}</item>`)
+      // Supernova stores letter spacing as a percentage value (e.g. 1 = 1%, -0.5 = -0.5%).
+      // Android's android:letterSpacing attribute is in em units, so divide by 10.
+      lines.push(`        <item name="android:letterSpacing">${letterSpacing / 10}</item>`)
     }
     if (family && subfamily) {
       const familySnake = toSnakeCase([family])
