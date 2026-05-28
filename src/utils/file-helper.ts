@@ -22,10 +22,10 @@ export function xmlFileHeader(showDisclaimer: boolean, disclaimer: string): stri
 /**
  * Converts a Supernova letter-spacing percentage value to the dimensionless
  * Android em unit used by android:letterSpacing.
- * Supernova stores 1 % as the number 1; Android expects 0.1 for 1 %.
+ * Supernova stores 1 % as the number 1; Android expects 0.01 for 1 %.
  */
 export function letterSpacingToEm(measure: number): number {
-  return measure / 10
+  return measure / 100
 }
 
 /**
