@@ -1,8 +1,8 @@
 import { AnyOutputFile, Token, TokenGroup, TokenType } from "@supernovaio/sdk-exporters"
 import type { TypographyTokenValue } from "@supernovaio/sdk-exporters"
 import { exportConfiguration } from "../index"
-import { createTextFile } from "../utils/file-helper"
-import { tokenPascalName, toSnakeCase } from "../utils/naming"
+import { createTextFile, letterSpacingToEm, lineHeightToMultiplier, xmlFileHeader } from "../utils/file-helper"
+import { tokenPascalName, tokenSnakeName, toSnakeCase } from "../utils/naming"
 
 export interface FontInfo {
   family: string
@@ -38,7 +38,7 @@ export function collectFonts(tokens: Token[]): Map<string, FontInfo> {
   return fontsMap
 }
 
-function renderTextStyles(tokens: Token[], tokenGroups: TokenGroup[]): string {
+function renderTextStyles(tokens: Token[], tokenGroups: TokenGroup[], tokenById: Map<string, Token>): string {
   const typographyTokens = tokens.filter((t) => t.tokenType === TokenType.typography)
   const lines: string[] = []
 
@@ -48,24 +48,29 @@ function renderTextStyles(tokens: Token[], tokenGroups: TokenGroup[]): string {
     }
 
     const value = (token as unknown as { value: TypographyTokenValue }).value
-
-    // fontFamily.text → "Helvetica Now Display"
-    // fontWeight.text → "Regular" / "Bold" / "Light Italic" …
     const family = value?.fontFamily?.text
     const subfamily = value?.fontWeight?.text
     const fontSize = value?.fontSize?.measure
     const letterSpacing = value?.letterSpacing?.measure
+    const lineHeight = value?.lineHeight?.measure
 
     const styleName = tokenPascalName(token, tokenGroups)
     lines.push(`    <style name="${styleName}">`)
 
     if (fontSize !== undefined) {
-      lines.push(`        <item name="android:textSize">${fontSize}sp</item>`)
+      const ref = exportConfiguration.useReferences ? tokenById.get(value.fontSize.referencedTokenId ?? "") : null
+      const textSize = ref ? `@dimen/${tokenSnakeName(ref, tokenGroups)}` : `${fontSize}sp`
+      lines.push(`        <item name="android:textSize">${textSize}</item>`)
     }
     if (letterSpacing !== undefined) {
-      // Supernova stores letter spacing as a percentage value (e.g. 1 = 1%, -0.5 = -0.5%).
-      // Android's android:letterSpacing attribute is in em units, so divide by 10.
-      lines.push(`        <item name="android:letterSpacing">${letterSpacing / 10}</item>`)
+      const ref = exportConfiguration.useReferences ? tokenById.get(value.letterSpacing.referencedTokenId ?? "") : null
+      const ls = ref ? `@dimen/${tokenSnakeName(ref, tokenGroups)}` : String(letterSpacingToEm(letterSpacing))
+      lines.push(`        <item name="android:letterSpacing">${ls}</item>`)
+    }
+    if (lineHeight !== undefined) {
+      const ref = exportConfiguration.useReferences ? tokenById.get(value.lineHeight!.referencedTokenId ?? "") : null
+      const lh = ref ? `@dimen/${tokenSnakeName(ref, tokenGroups)}` : String(lineHeightToMultiplier(lineHeight))
+      lines.push(`        <item name="android:lineSpacingMultiplier">${lh}</item>`)
     }
     if (family && subfamily) {
       const familySnake = toSnakeCase([family])
@@ -81,10 +86,9 @@ function renderTextStyles(tokens: Token[], tokenGroups: TokenGroup[]): string {
 }
 
 export function generateTextStylesFile(tokens: Token[], tokenGroups: TokenGroup[]): AnyOutputFile {
-  const header = exportConfiguration.showGeneratedFileDisclaimer
-    ? `<!-- ${exportConfiguration.disclaimer.split("\n")[0]} -->\n`
-    : ""
-  const body = renderTextStyles(tokens, tokenGroups)
+  const tokenById = new Map<string, Token>(tokens.map((t) => [t.id, t]))
+  const header = xmlFileHeader(exportConfiguration.showGeneratedFileDisclaimer, exportConfiguration.disclaimer)
+  const body = renderTextStyles(tokens, tokenGroups, tokenById)
   const content = `${header}<?xml version="1.0" encoding="utf-8"?>\n<resources>\n\n${body}\n\n</resources>`
   return createTextFile("res/values/", "exported_text_styles.xml", content)
 }

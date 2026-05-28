@@ -5,6 +5,8 @@ import { generateColorFiles } from "./files/colors"
 import { generateDimenFiles } from "./files/dimens"
 import { generateRadiiFile } from "./files/radii"
 import { generateTextStylesFile } from "./files/text-styles"
+import { generateShadowsFile } from "./files/shadows"
+import { generateGradientFiles } from "./files/gradients"
 
 export const exportConfiguration = Pulsar.exportConfig<ExporterConfiguration>()
 
@@ -42,6 +44,8 @@ Pulsar.export(async (sdk: Supernova, context: PulsarContext): Promise<Array<AnyO
     ...generateDimenFiles(tokens, tokenGroups, themedTokenSets),
     generateRadiiFile(tokens, tokenGroups),
     generateTextStylesFile(tokens, tokenGroups),
+    generateShadowsFile(tokens, tokenGroups),
+    ...generateGradientFiles(tokens, tokenGroups),
   ]
 
   return outputFiles

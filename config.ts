@@ -9,4 +9,9 @@ export type ExporterConfiguration = {
   exportOnlyThemedTokens: boolean
   /** Generate the base (light) colour file at res/values/. */
   exportBaseValues: boolean
+  /**
+   * When true, token values that alias another token emit an Android resource
+   * reference (e.g. @color/core_blue_500) instead of the resolved raw value.
+   */
+  useReferences: boolean
 }

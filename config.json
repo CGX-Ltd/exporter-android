@@ -10,7 +10,7 @@
   {
     "key": "showGeneratedFileDisclaimer",
     "type": "boolean",
-    "default": true,
+    "default": false,
     "title": "Show file disclaimer",
     "description": "Add a message at the top of each file explaining it was automatically generated.",
     "category": "Output"
@@ -41,5 +41,13 @@
     "title": "Export base values",
     "description": "Generate the base (light) colour file at res/values/.",
     "category": "Themes"
+  },
+  {
+    "key": "useReferences",
+    "type": "boolean",
+    "default": true,
+    "title": "Use token references",
+    "description": "Values will use references to other tokens (where applicable).",
+    "category": "Token values"
   }
 ]

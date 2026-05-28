@@ -2,7 +2,7 @@ import { Token, TokenGroup } from "@supernovaio/sdk-exporters"
 
 export function tokenFullPath(token: Token, tokenGroups: TokenGroup[]): string[] {
   const group = tokenGroups.find((g) => g.id === token.parentGroupId)
-  if (!group || group.isRoot || (group as any).isNonVirtualRoot) {
+  if (!group || group.isRoot) {
     return [token.name]
   }
 
