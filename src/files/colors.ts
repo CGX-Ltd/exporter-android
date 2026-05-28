@@ -5,7 +5,6 @@ import type { ThemeTokenSet } from "../types"
 import { createTextFile, xmlFileHeader } from "../utils/file-helper"
 import { tokenSnakeName } from "../utils/naming"
 import { toAndroidColor } from "../utils/color"
-import { SIZE_THEME_DIR } from "./dimens"
 
 // Android resource qualifier for the dark/night colour theme.
 // Color themes (i.e. themes that override colour tokens) always write here;
@@ -62,13 +61,13 @@ export function generateColorFiles(
 
   // Iterate every theme and generate a night-mode colour file for the first
   // theme that: (a) is not a known size theme, and (b) overrides at least one
-  // colour token. Android only supports a single values-night directory, so
-  // we stop after the first match to prevent duplicate-path errors.
+  // Only write values-night for a theme explicitly named "dark" (case-insensitive).
+  // Using the name rather than inspecting overridden token types avoids size themes
+  // that happen to also override a colour token claiming the night-mode slot.
   let darkThemeWritten = false
   for (const { theme, tokens: themedTokens } of themedTokenSets) {
-    const isSizeTheme = !!SIZE_THEME_DIR[theme.name.toLowerCase()]
-    const hasColorOverrides = theme.overriddenTokens.some((t) => t.tokenType === TokenType.color)
-    if (isSizeTheme || !hasColorOverrides || darkThemeWritten) continue
+    const isDarkTheme = theme.name.toLowerCase().includes("dark")
+    if (!isDarkTheme || darkThemeWritten) continue
 
     // Build a lookup map from the themed token set for reference resolution
     // within the dark-mode file.
