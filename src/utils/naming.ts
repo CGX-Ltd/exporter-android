@@ -6,7 +6,22 @@ export function tokenFullPath(token: Token, tokenGroups: TokenGroup[]): string[]
     return [token.name]
   }
 
-  return [...group.path, group.name, token.name]
+  const parts = [...group.path, group.name, token.name]
+
+  // Strip leading segments that reappear later in the path — these are redundant
+  // category wrappers from the design token hierarchy (e.g. ["Spacing", "Core", "Spacing", "0"]
+  // becomes ["Core", "Spacing", "0"]). Comparison is normalised to match snake_case output.
+  const normalise = (s: string) =>
+    s
+      .replace(/([a-z])([A-Z])/g, "$1_$2")
+      .replace(/[\s\-]+/g, "_")
+      .toLowerCase()
+
+  while (parts.length > 1 && parts.slice(1).map(normalise).includes(normalise(parts[0]))) {
+    parts.shift()
+  }
+
+  return parts
 }
 
 export function toSnakeCase(parts: string[]): string {
