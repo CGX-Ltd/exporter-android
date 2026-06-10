@@ -115,6 +115,18 @@ export const SIZE_THEME_DIR: Readonly<Record<string, string>> = {
   large:  "res/values-w1400dp/",
 }
 
+/** Returns true when a themed token's value is identical to its base counterpart. */
+function tokenValueMatchesBase(themedToken: Token, baseToken: Token): boolean {
+  const themedRef = (themedToken as any).value?.referencedTokenId
+  const baseRef = (baseToken as any).value?.referencedTokenId
+  if (themedRef !== undefined || baseRef !== undefined) {
+    return themedRef === baseRef
+  }
+  const themedMeasure = (themedToken as any).value?.measure ?? 0
+  const baseMeasure = (baseToken as any).value?.measure ?? 0
+  return themedMeasure === baseMeasure
+}
+
 export function generateDimenFiles(
   baseTokens: Token[],
   tokenGroups: TokenGroup[],
@@ -124,13 +136,26 @@ export function generateDimenFiles(
     ...filesForDir("res/values/", baseTokens, tokenGroups),
   ]
 
+  const baseTokenById = new Map<string, Token>(baseTokens.map((t) => [t.id, t]))
+
   // Generate per-type files for each known size theme (overrides only).
   // Colour-only themes (e.g. "Dark") and unrecognised theme names are skipped.
   for (const { theme, tokens: themedTokens } of themedTokenSets) {
     const dir = SIZE_THEME_DIR[theme.name.toLowerCase()]
     if (!dir) continue
 
-    const overriddenIds = new Set<string>(theme.overriddenTokens.map((t) => t.id))
+    const themedTokenById = new Map<string, Token>(themedTokens.map((t) => [t.id, t]))
+    const overriddenIds = new Set<string>(
+      theme.overriddenTokens
+        .map((t) => t.id)
+        .filter((id) => {
+          const base = baseTokenById.get(id)
+          const themed = themedTokenById.get(id)
+          if (!base || !themed) return true
+          return !tokenValueMatchesBase(themed, base)
+        })
+    )
+
     files.push(...filesForDir(dir, themedTokens, tokenGroups, overriddenIds))
   }
 
